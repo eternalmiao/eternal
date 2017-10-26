@@ -1,0 +1,69 @@
+package cn.bug.dao.impl;
+
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import cn.bug.bean.Command;
+import cn.bug.dao.CommandDao;
+import cn.bug.dao.GOrderDao;
+import cn.bug.dao.ShopUserDao;
+import cn.bug.util.BaseDao;
+
+public class CommandDaoImpl extends BaseDao<Command> implements CommandDao {
+
+	@Override
+	public boolean AddCommand(Command comm) {
+		String sql = "insert into command (oid,u_id,content,ctime,cscore) values (?,?,?,?,?)";
+		int num = executUpdate(sql, comm.getgOrder().getOid(), comm.getUser()
+				.getU_id(), comm.getContent(), new Date(comm.getCtime().getTime()),
+				comm.getCsore());
+		if (num > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<Command> FindCommamdByGid(int gid) {
+		String sql = "select c.* from command c,gorder o,inventory i "
+				+ "where c.oid=o.oid and o.iid=i.iid and i.gid=?";
+		return executQuery(sql, gid);
+	}
+
+	@Override
+	public Command FindCommandByOid(int oid) {
+		String sql = "select c.* from command c where c.oid=?";
+		ResultSet res = executeQuery(sql, oid);
+		try {
+			while(res.next()){
+				return getEntity(res);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public Command getEntity(ResultSet rs) {
+		GOrderDao goDao = new GOrderDaoImpl();
+		ShopUserDao suDao = new ShopUserDaoImpl();
+		try {
+		
+				Command command = new Command();
+				command.setCid(rs.getInt("cid"));
+				command.setgOrder(goDao.FindOrderByOid(rs.getInt("oid")));
+				command.setUser(suDao.findUserById(rs.getInt("u_id")));
+				command.setContent(rs.getString("content"));
+				command.setCtime(rs.getDate("ctime"));
+				command.setCsore(rs.getInt("cscore"));
+				return command;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+}

@@ -1,0 +1,326 @@
+<%@page import="cn.bug.framework.GetPhoto"%>
+<%@page import="cn.bug.bean.PageBean"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8" errorPage="404.jsp"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>商品浏览</title>
+<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+<!-- Custom Theme files -->
+<!--theme-style-->
+<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />	
+<!--//theme-style-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="Shopin Responsive web template, Bootstrap Web Templates, Flat Web Templates, AndroId Compatible web template, 
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!--theme-style-->
+<link href="css/style4.css" rel="stylesheet" type="text/css" media="all" />	
+<!--//theme-style-->
+<script src="js/jquery-1.8.3.js"></script>
+<!--- start-rate---->
+<script src="js/jstarbox.js"></script>
+	<link rel="stylesheet" href="css/jstarbox.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript">
+			window.onload=function(){
+				var gca = "<%=request.getParameter("gca")%>";
+				var gtype = "<%=request.getParameter("gtype")%>";
+				var brand = "<%=request.getParameter("brand")%>";
+				if(gca!=null){
+					var gcas = gca.split("",6);
+					if(gcas!=null){
+						for(var i=0;i<gcas.length;i++){
+							var gcks = document.getElementsByName("gcheckbox");
+							var id =gcas[i];
+							for(var x=0;x<gcks.length;x++){
+								if(gcks[x].value==id){
+									gcks[x].checked=true;
+								}
+							}
+						}
+					}
+				}
+				if(gtype!=null){
+					var gtypes = gtype.split("",18);
+					if(gtypes!=null){
+						for(var i=0;i<gtypes.length;i++){
+							var cks = document.getElementsByName("checkbox");
+							var id =gtypes[i];
+							for(var x=0;x<cks.length;x++){
+								if(cks[x].value==id){
+									cks[x].checked=true;
+								}
+							}
+						}
+					}
+				}
+				if(brand!=null){
+					var brands = brand.split("",18);
+					if(brands!=null){
+						for(var i=0;i<brands.length;i++){
+							var bcks = document.getElementsByName("bcheckbox");
+							var id =brands[i];
+							for(var x=0;x<bcks.length;x++){
+								if(bcks[x].value==id){
+									bcks[x].checked=true;
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			jQuery(function() {
+				
+				$("[class*=checkbox]").bind("change",function(){
+					var cks = document.getElementsByName("checkbox");
+					var bcks = document.getElementsByName("bcheckbox");
+					var gcks = document.getElementsByName("gcheckbox");
+					var url="Product.do?gtype=";
+					for(var i=0;i<cks.length;i++){
+						if(cks[i].checked){
+							url=url+cks[i].value;
+						}
+					}
+					url=url+"&brand=";
+					for(var j=0;j<bcks.length;j++){
+						if(bcks[j].checked){
+							url=url+bcks[j].value;
+					}
+					}
+					url=url+"&gca=";
+					for(var l=0;l<gcks.length;l++){
+						if(gcks[l].checked){
+							url=url+gcks[l].value;
+					}
+					}
+					location.href=url;
+				})
+				
+			jQuery('.starbox').each(function() {
+				var starbox = jQuery(this);
+					starbox.starbox({
+					average: starbox.attr('data-start-value'),
+					changeable: starbox.hasClass('unchangeable') ? false : starbox.hasClass('clickonce') ? 'once' : true,
+					ghosting: starbox.hasClass('ghosting'),
+					autoUpdateAverage: starbox.hasClass('autoupdate'),
+					buttons: starbox.hasClass('smooth') ? false : starbox.attr('data-button-count') || 5,
+					stars: starbox.attr('data-star-count') || 5
+					}).bind('starbox-value-changed', function(event, value) {
+					if(starbox.hasClass('random')) {
+					var val = Math.random();
+					starbox.next().text(' '+val);
+					return val;
+					} 
+				})
+			});
+			
+			
+		});
+		
+		</script>
+<!---//End-rate---->
+<link href="css/form.css" rel="stylesheet" type="text/css" media="all" />
+<style type="text/css">
+	.price{
+		color:#E4393C;
+	}
+</style>
+</head>
+<body>
+<!--header-->
+<jsp:include page="header.jsp" flush="true"></jsp:include>
+<!--banner-->
+<div class="banner-top">
+		<div class="container">
+			<h1>商品</h1>
+			<em></em>
+			<h2>
+				<a href="Index.do">主页</a><label>/</label>商品</a>
+			</h2>
+		</div>
+	</div>
+
+	<!--content-->
+		<div class="product">
+			<div class="container">
+			<div class="col-md-9">
+			<div class="mid-popular">
+			<c:forEach items="${pagebean.list }" var="good">
+			
+					<div class="col-md-4 item-grid1 simpleCart_shelfItem">
+					<div class=" mid-pop">
+					<div class="pro-img">
+						<img src="${good.imgUrl }/1.jpg" class="img-responsive" alt="">
+						<div class="zoom-icon ">
+						<a class="picture" href="${good.imgUrl }/1.jpg" rel="title" class="b-link-stripe b-animate-go  thickbox"><i class="glyphicon glyphicon-search icon "></i></a>
+						<a href="SingleShow.do?gid=${good.gid }"><i class="glyphicon glyphicon-menu-right icon"></i></a>
+						</div>
+						</div>
+						<div class="mid-1">
+						<div class="women">
+						<div class="women-top">
+							<span>${good.brand.bname} </span>
+							<p><a href="SingleShow.do?gid=${good.gid }">${good.gname}</a></p>
+							</div>
+							<div class="img item_add">
+								<a href="#"><img src="images/ca.png" alt=""></a>
+							</div>
+							<div class="clearfix"></div>
+							</div>
+							<div class="mid-2">
+								<p ><label>￥${good.old_price}</label><em class="price">￥${good.new_price}</em></p>
+								  <div class="block">
+									<div class="starbox small ghosting"> </div>
+								</div>
+								
+								<div class="clearfix"></div>
+							</div>
+							
+						</div>
+					</div>
+					</div>
+					</c:forEach>
+					<div class="clearfix"></div>
+					
+					<center>
+					<c:if test="${pagebean.pageIndex==1}">
+						<label>首页</label>&nbsp;&nbsp;
+						<label>上一页</label>&nbsp;&nbsp;
+					</c:if>
+					<c:if test="${pagebean.pageIndex!=1}">
+						<a href="Product.do?gca=${gca }&gtype=${gtype }&brand=${brand}&index=1">首页</a>&nbsp;&nbsp;
+						<a href="Product.do?gca=${gca }&gtype=${gtype }&brand=${brand}&index=${pagebean.pageIndex-1}">上一页</a>&nbsp;&nbsp;
+					</c:if>	
+					<c:if test="${ pagebean.pageCount==pagebean.pageIndex}">
+						<label>下一页</label>&nbsp;&nbsp;
+						<label>末页</label>&nbsp;&nbsp;
+					</c:if>
+					<c:if test="${ pagebean.pageCount!=pagebean.pageIndex}">
+						<a href="Product.do?gca=${requestScope.gca }&gtype=${requestScope.gtype }&brand=${requestScope.brand}&index=${pagebean.pageIndex+1}">下一页</a>&nbsp;&nbsp;
+						<a href="Product.do?gca=${requestScope.gca }&gtype=${requestScope.gtype }&brand=${requestScope.brand}&index=${pagebean.pageCount}">末页</a>&nbsp;&nbsp;
+					</c:if>
+						当前第&nbsp;${pagebean.pageIndex }&nbsp;页&nbsp;共&nbsp;${pagebean.pageCount }页
+					</center>
+				</div>
+			</div>
+			
+			
+			<div class="col-md-3 product-bottom">
+			<!--categories-->
+				
+				<!--initiate accordion-->
+						<script type="text/javascript">
+							$(function() {
+							    var menu_ul = $('.menu-drop > li > ul'),
+							           menu_a  = $('.menu-drop > li > a');
+							    menu_ul.hide();
+							    menu_a.click(function(e) {
+							        e.preventDefault();
+							        if(!$(this).hasClass('active')) {
+							            menu_a.removeClass('active');
+							            menu_ul.filter(':visible').slideUp('normal');
+							            $(this).addClass('active').next().stop(true,true).slideDown('normal');
+							        } else {
+							            $(this).removeClass('active');
+							            $(this).next().stop(true,true).slideUp('normal');
+							        }
+							    });
+							
+							});
+						</script>
+<!--//menu-->
+ <!--<section  class="sky-form">
+					<h4 class="cate">Discounts</h4>
+					 <div class="row row1 scroll-pane">
+						 <div class="col col-4">
+								<label class="checkbox"><input type="checkbox" name="checkbox" checked=""><i></i>Upto - 10% (20)</label>
+						 </div>
+						 <div class="col col-4">
+								<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>40% - 50% (5)</label>
+								<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>30% - 20% (7)</label>
+								<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>10% - 5% (2)</label>
+								<label class="checkbox"><input type="checkbox" name="checkbox"><i></i>Other(50)</label>
+						 </div>
+					 </div>
+				 </section> 				 				 -->
+				 
+					
+					 <!---->
+					  <section  class="sky-form">
+						<h4 class="cate">用户类型</h4>
+							<div class="row row1 scroll-pane">
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="gcheckbox" value="1" ><i></i>男装</label>
+								</div>
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="gcheckbox" value="2"><i></i>女装</label>
+									<label class="checkbox"><input type="checkbox" name="gcheckbox" value="3"><i></i>童装</label>
+								</div>
+							</div>
+				   </section>
+					 <section  class="sky-form">
+						<h4 class="cate">衣服类型</h4>
+							<div class="row row1 scroll-pane">
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="checkbox" value="1" ><i></i>T恤</label>
+								</div>
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="checkbox" value="2"><i></i>衬衫</label>
+									<label class="checkbox"><input type="checkbox" name="checkbox" value="3"><i></i>POLO</label>
+									<label class="checkbox"><input type="checkbox" name="checkbox" value="4"><i></i>连衣裙</label>
+									<label class="checkbox"><input type="checkbox" name="checkbox" value="5"><i></i>短裙</label>
+								</div>
+							</div>
+				   </section>
+				   	<section  class="sky-form">
+						<h4 class="cate">品牌</h4>
+							<div class="row row1 scroll-pane">
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="1"><i></i>puma</label>
+								</div>
+								<div class="col col-4">
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="2"><i></i>Nike</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="3"><i></i>D&G</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="4"><i></i>vans</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="5"><i></i>A21</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="6"><i></i>美特斯邦威</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="7"><i></i>ONLY</label>
+									<label class="checkbox"><input type="checkbox" name="bcheckbox" value="8"><i></i>欧时力</label>
+								</div>
+							</div>
+				   </section>		
+		</div>
+			</div class="clearfix"></div>
+				<!--products-->
+			
+			<!--//products-->
+		<!--brand-->
+		<jsp:include page="footer.jsp" flush="true"></jsp:include>
+	<!--//content-->
+		<!--//footer-->
+
+		<!--//footer-->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+	<script src="js/simpleCart.min.js"> </script>
+<!-- slide -->
+<script src="js/bootstrap.min.js"></script>
+ <!--light-box-files -->
+		<script src="js/jquery.chocolat.js"></script>
+		<link rel="stylesheet" href="css/chocolat.css" type="text/css" media="screen" charset="utf-8">
+		<!--light-box-files -->
+		<script type="text/javascript" charset="utf-8">
+		$(function() {
+			$('a.picture').Chocolat();
+		});
+		</script>
+</body>
+</html>

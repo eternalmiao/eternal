@@ -1,0 +1,114 @@
+package cn.bug.dao.impl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.bug.bean.Cart;
+import cn.bug.bean.Inventory;
+import cn.bug.bean.ShopUser;
+import cn.bug.dao.CartDao;
+import cn.bug.dao.InventoryDao;
+import cn.bug.dao.ShopUserDao;
+import cn.bug.util.BaseDao;
+
+public class CartDaoImpl extends BaseDao<Cart> implements CartDao {
+
+	List<Cart> list = new ArrayList<Cart>();
+	InventoryDao ivd = new InventoryDaoImpl();
+	ShopUserDao sud = new ShopUserDaoImpl();
+
+	@Override
+	public boolean AddtoCart(Cart cart) {
+		boolean flag = false;
+		String sql = "insert into cart(canum,iid,u_id) values(?,?,?)";
+		int su = executUpdate(sql, cart.getCanum(), cart.getInventory()
+				.getIid(), cart.getUser().getU_id());
+		if (su > 0) {
+			flag = true;
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean DeleteOrderFormCart(int caid) {
+		boolean flag = false;
+		String sql = "delete from cart where caid = ?";
+		int su = executUpdate(sql, caid);
+		if (su > 0) {
+			flag = true;
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean UpdateCart(Cart cart) {
+		boolean flag = false;
+		String sql = "update cart set canum=? where caid=?";
+		int su = executUpdate(sql, cart.getCanum(), cart.getCaid());
+		if (su > 0) {
+			flag = true;
+		}
+		return flag;
+	}
+
+	@Override
+	public List<Cart> FindCartByUser(int uid) {
+		String sql = "select * from cart where u_id=?";
+		list = executQuery(sql, uid);
+		return list;
+	}
+
+	@Override
+	public Cart getEntity(ResultSet rs) {
+		Cart cart = new Cart();
+		try {
+			cart.setCaid(rs.getInt(1));
+			cart.setCanum(rs.getInt(2));
+			Inventory inv = ivd.FindInventoryByIid(rs.getInt(3));
+			cart.setInventory(inv);
+			ShopUser user = sud.findUserById(rs.getInt(4));
+			cart.setUser(user);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return cart;
+	}
+
+
+	public Cart FindCartByCaid(int caid) {
+		String sql = "select * from cart where caid=?";
+		ResultSet res = executeQuery(sql, caid);
+		try {
+			if(res.next()) {
+				Cart cart = getEntity(res);
+				return cart;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			closeAll(res, null, null);
+		}
+		return null;	
+		
+	}
+
+	@Override
+	public boolean FindCartByUidAndCid(int uid, int iid) {
+		String sql = "select * from cart where u_id=? and iid=?";
+		ResultSet rs = executeQuery(sql, uid,iid);
+
+		try {
+			if(rs.next()){
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			closeAll(rs, null, null);
+		}
+		return false;
+	}
+}

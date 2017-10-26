@@ -1,0 +1,35 @@
+package cn.bug.action;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import cn.bug.bean.Cart;
+import cn.bug.bean.ShopUser;
+import cn.bug.dao.CartDao;
+import cn.bug.dao.ShopUserDao;
+import cn.bug.dao.impl.CartDaoImpl;
+import cn.bug.dao.impl.ShopUserDaoImpl;
+import cn.bug.framework.Action;
+
+public class CartServlet extends HttpServlet implements Action {
+
+	@Override
+	public String execute(HttpServletRequest request,
+			HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		CartDao cd = new CartDaoImpl();
+		List<Cart> list = cd.FindCartByUser(2);;
+		session.setAttribute("CartList", list);
+		//<测试>
+			ShopUserDao ud =  new ShopUserDaoImpl();
+			ShopUser user = ud.findUserById(2);
+			session.setAttribute("ShopUser", user);
+		//</测试>
+		return "cart.jsp";
+	}
+
+}

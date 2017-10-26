@@ -1,0 +1,38 @@
+package cn.bug.dao;
+
+import java.util.List;
+
+import cn.bug.bean.Wishlist;
+/**
+ * 
+ * @author vincent
+ *
+ */
+public interface WishlistDao {
+	/**
+	 * 添加收藏
+	 * @param wishlist
+	 * @return
+	 */
+	public boolean AddWishlist(Wishlist wishlist);
+	/**
+	 * 删除收藏
+	 * @param wid
+	 * @return
+	 */
+	public boolean deleteWishList(int wid);
+	/**
+	 * 通过用户查询收藏
+	 * @param uid
+	 * @return
+	 */
+	public List<Wishlist> FindWishListByUser(int uid);
+	/**
+	 * 用于检验是否加入了收藏，防止再次加入
+	 * @param uid
+	 * @param wid
+	 * @return
+	 */
+	public boolean FindWislistByUserAndWid(int uid,int wid);
+	
+}

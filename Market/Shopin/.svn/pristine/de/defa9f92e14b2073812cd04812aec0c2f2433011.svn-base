@@ -1,0 +1,158 @@
+package cn.bug.dao.impl;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import cn.bug.bean.GOrder;
+import cn.bug.bean.PageBean;
+import cn.bug.dao.GOrderDao;
+import cn.bug.dao.InventoryDao;
+import cn.bug.dao.ShopUserDao;
+import cn.bug.util.BaseDao;
+
+public class GOrderDaoImpl extends BaseDao<GOrder> implements GOrderDao {
+	ShopUserDao shopUserDao = new ShopUserDaoImpl();
+	InventoryDao inventoryDao = new InventoryDaoImpl();
+	@Override
+	public boolean AddGOrder(GOrder order) {
+		int flag = 0;
+		String sql = "insert into gorder(u_id, iid, ostatus, price, otime, oaddress, receiver, rephone) "
+				+ "values(?, ?, ?, ?, ?, ?, ?, ?)";
+		flag = executUpdate(sql, order.getUser().getU_id(),  order.getIt().getIid(),
+				order.getOstatus(), order.getPrice(), order.getOtime(), order.getOaddress(),
+				order.getReceiver(), order.getRephone());
+		if(flag == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean updateGOrder(GOrder order) {
+		int flag = 0;
+		String sql = "update gorder set u_id=?, iid=?, ostatus=?, price=?, "
+				+ "otime=?, oaddress=?, receiver=?, rephone=? where oid=?";
+		flag = executUpdate(sql, order.getUser().getU_id(),  order.getIt().getIid(),
+				order.getOstatus(), order.getPrice(), order.getOtime(), order.getOaddress(),
+				order.getReceiver(), order.getRephone(), order.getOid());
+		if(flag == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public GOrder FindOrderByOid(int oid) {	
+		GOrder gOrder = null;
+		String sql = "select * from gorder where oid = ?";
+		ResultSet res = executeQuery(sql, oid);
+		try {
+			while(res.next()) {
+				gOrder = getEntity(res);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			closeAll(res, null, null);
+		}
+		return gOrder;	
+	}
+
+	@Override
+	public PageBean<GOrder> FindGOrderByUser(int uid, int index, int pageSize) {
+		PageBean<GOrder> pageBean = new PageBean<GOrder>();
+		pageBean.setPageIndex(index);
+		pageBean.setPageSize(pageSize);
+		String sql = "select * from gorder where u_id = ?";
+		int count = getCount(sql, uid);
+		pageBean.setTotalCount(count);
+		sql = "select * from (select go.*, rownum rn from gorder go where u_id = ?) where rn>? and rn<=? order by otime desc";
+		if(pageBean.getTotalCount() > 0) {
+			int startRow = (pageBean.getPageIndex() - 1) * pageBean.getPageSize();
+			int endRow = pageBean.getPageIndex() * pageBean.getPageSize();
+			List<GOrder> list = executQuery(sql, uid, startRow, endRow);
+			pageBean.setList(list);
+		}
+		return pageBean;		
+				
+	}
+
+	@Override
+	public PageBean<GOrder> FindGOrderByStatus(int status, int index,
+			int pageSize) {
+		PageBean<GOrder> pageBean = new PageBean<GOrder>();
+		pageBean.setPageIndex(index);
+		pageBean.setPageSize(pageSize);
+		String sql = "select * from gorder where ostatus = ?";
+		int count = getCount(sql, status);
+		pageBean.setTotalCount(count);
+		sql = "select * from (select go.*, rownum rn from gorder go where ostatus = ?) where rn>? and rn<=?";
+		if(pageBean.getTotalCount() > 0) {
+			int startRow = (pageBean.getPageIndex() - 1) * pageBean.getPageSize();
+			int endRow = pageBean.getPageIndex() * pageBean.getPageSize();
+			List<GOrder> list = executQuery(sql, status, startRow, endRow);
+			pageBean.setList(list);
+		}
+		return pageBean;
+	}
+
+	@Override
+	public PageBean<GOrder> FindAllGOrder(int index,int pageSize) {
+		PageBean<GOrder> pageBean = new PageBean<GOrder>();
+		pageBean.setPageIndex(index);
+		pageBean.setPageSize(pageSize);
+		String sql = "select * from gorder";
+		int count = getCount(sql);
+		pageBean.setTotalCount(count);
+		sql = "select * from (select go.*, rownum rn from gorder go) where rn>? and rn<=?";
+		if(pageBean.getTotalCount() > 0) {
+			int startRow = (pageBean.getPageIndex() - 1) * pageBean.getPageSize();
+			int endRow = pageBean.getPageIndex() * pageBean.getPageSize();
+			List<GOrder> list = executQuery(sql, startRow, endRow);
+			pageBean.setList(list);
+		}
+		return pageBean;
+	}
+
+	@Override
+	public PageBean<GOrder> FindOrderByGid(int gid,int index,int pageSize) {
+		PageBean<GOrder> pageBean = new PageBean<GOrder>();
+		pageBean.setPageIndex(index);
+		pageBean.setPageSize(pageSize);
+		String sql = "select * from gorder where iid in (select iid from inventory where gid = ?)";
+		int count = getCount(sql, gid);
+		pageBean.setTotalCount(count);
+		sql = "select * from (select go.*, rownum rn from gorder go where iid in (select iid from inventory where gid = ?)) where rn>? and rn<=?";
+		if(pageBean.getTotalCount() > 0) {
+			int startRow = (pageBean.getPageIndex() - 1) * pageBean.getPageSize();
+			int endRow = pageBean.getPageIndex() * pageBean.getPageSize();
+			List<GOrder> list = executQuery(sql, gid, startRow, endRow);
+			pageBean.setList(list);
+		}
+		return pageBean;
+	
+	}
+
+	@Override
+	public GOrder getEntity(ResultSet rs) {
+		GOrder gorder = null;
+		try {
+				gorder = new GOrder();
+				gorder.setOid(rs.getInt(1));
+				gorder.setUser(shopUserDao.findUserById(rs.getInt(2)));
+				gorder.setIt(inventoryDao.FindInventoryByIid(rs.getInt(3)));
+				gorder.setOstatus(rs.getInt(4));
+				gorder.setPrice(rs.getDouble(5));
+				gorder.setOtime(rs.getDate(6));
+				gorder.setOaddress(rs.getString(7));
+				gorder.setReceiver(rs.getString(8));
+				gorder.setRephone(rs.getInt(9));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return gorder;
+	}	
+
+}

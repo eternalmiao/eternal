@@ -1,0 +1,53 @@
+package cn.bug.action;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import cn.bug.bean.GOrder;
+import cn.bug.bean.Orther;
+import cn.bug.bean.PageBean;
+import cn.bug.bean.ShopUser;
+import cn.bug.dao.GOrderDao;
+import cn.bug.dao.impl.GOrderDaoImpl;
+import cn.bug.framework.Action;
+
+public class OrderServlet implements Action {
+
+	@Override
+	public String execute(HttpServletRequest request,
+			HttpServletResponse response) {
+		// TODO Auto-generated method stub
+		GOrderDao oDao = new GOrderDaoImpl();
+		HttpSession session=request.getSession();
+		ShopUser user=(ShopUser) session.getAttribute("user");
+		if (user==null) {
+			return "login.jsp";
+		}
+		int uid=user.getU_id();
+		PageBean<GOrder> pb=null;
+		if (request.getAttribute("order_pb")!=null)
+		{
+			pb=(PageBean<GOrder>) request.getAttribute("order_pb");
+		}
+		int index;
+		String in=request.getParameter("index");
+		if (in!=null)
+		{
+			index=Integer.parseInt(in);
+		}else {
+			index=1;
+		}
+		pb=oDao.FindGOrderByUser(uid, index, 2);
+		if (index>pb.getPageCount())
+		{
+			index=pb.getPageCount();
+		}
+		pb=oDao.FindGOrderByUser(uid, index, 2);
+		request.setAttribute("order_pb", pb);
+		String[] list=Orther.status;
+		request.setAttribute("list", list);
+		return "order.jsp";
+	}
+
+}

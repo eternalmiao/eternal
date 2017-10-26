@@ -1,0 +1,75 @@
+package cn.bug.dao.impl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import cn.bug.bean.Wishlist;
+import cn.bug.dao.GoodsDao;
+import cn.bug.dao.ShopUserDao;
+import cn.bug.dao.WishlistDao;
+import cn.bug.util.BaseDao;
+
+public class WishlistDaoImpl extends BaseDao<Wishlist> implements WishlistDao {
+
+	@Override
+	public boolean AddWishlist(Wishlist wishlist) {
+		String sql="insert into Wishlist(gid,u_id) values(?,?)";
+		int num=executUpdate(sql, wishlist.getGoods().getGid(),wishlist.getUser().getU_id());
+		if (num>0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean deleteWishList(int wid) {
+		String sql="delete Wishlist where Wid=?";
+		int num=executUpdate(sql, wid);
+		if (num>0) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<Wishlist> FindWishListByUser(int uid) {
+		String sql="select * from Wishlist where U_id=?";
+		List<Wishlist> wlist = executQuery(sql, uid);
+		return wlist;
+	}
+
+	@Override
+	public Wishlist getEntity(ResultSet rs) {
+		ShopUserDao uDao=new ShopUserDaoImpl();
+		GoodsDao gDao=new GoodsDaoImpl();
+		Wishlist wishlist=null;
+		try {
+				wishlist = new Wishlist();
+				wishlist.setWid(rs.getInt(1));
+				wishlist.setGoods(gDao.findGoodsById(rs.getInt(2)));
+				wishlist.setUser(uDao.findUserById(rs.getInt(3)));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return wishlist;
+	}
+
+	@Override
+	public boolean FindWislistByUserAndWid(int uid, int gid) {
+		String sql = "select * from Wishlist where u_id=? and gid=?" ;
+		ResultSet rs = executeQuery(sql, uid,gid);
+		try {
+			if(rs.next()){
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			closeAll(rs, null, null);
+		}
+		return false;
+	}
+
+}

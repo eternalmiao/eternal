@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="Shopin"
+  id="myeclipse.1469358215426"
+  context-root="/Shopin"
+  j2ee-spec="6.0"
+  archive="Shopin.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

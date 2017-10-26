@@ -1,0 +1,361 @@
+package cn.bug.dao.impl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.bug.bean.Goods;
+import cn.bug.bean.PageBean;
+import cn.bug.dao.BrandDao;
+import cn.bug.dao.GoodsDao;
+import cn.bug.dao.GtypeDao;
+import cn.bug.util.BaseDao;
+
+/**
+ * 
+ * @author ffpff
+ * 
+ */
+public class GoodsDaoImpl extends BaseDao<Goods> implements GoodsDao {
+
+	@Override
+	public boolean addGoods(Goods good) {
+		// TODO Auto-generated method stub
+		String sql = "insert into goods (gname,new_price,old_price,description,imgUrl,gtypeId,gcategories,brandId)"
+				+ "values (?,?,?,?,?,?,?,?)";
+		int num = executUpdate(sql, good.getGname(), good.getNew_price(),
+				good.getOld_price(), good.getDescription(), good.getImgUrl(),
+				good.getType().getTid(), good.getGcategories(), good.getBrand()
+						.getBid());
+		if (num > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean updateGoods(Goods good) {
+		String sql = "update goods set gname=?,new_price=?,old_price=?,description=?,"
+				+ "imgUrl=?,gtypeId=?,gcategories=?,brandId=? where gid=?";
+		int num = executUpdate(sql, good.getGname(), good.getNew_price(),
+				good.getOld_price(), good.getDescription(), good.getImgUrl(),
+				good.getType().getTid(), good.getGcategories(), good.getBrand()
+						.getBid(), good.getGid());
+		if (num > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean deleteGoods(int gid) {
+		String sql = "delete from goods where gid=?";
+		int num = executUpdate(sql, gid);
+		if (num > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public Goods findGoodsById(int gid) {
+		String sql = "select * from goods where gid=?";
+		ResultSet rs = executeQuery(sql, gid);
+		if (rs != null) {
+			try {
+				if (rs.next()) {
+					return getEntity(rs);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} 
+		return null;
+	}
+
+	@Override
+	public Goods FindGoodsByGname(String gname) {
+		String sql = "select * from goods where gname=?";
+		ResultSet rs = executeQuery(sql, gname);
+		return getEntity(rs);
+	}
+
+	@Override
+	public PageBean<Goods> FindGoodsByTypeId(List<Integer> tids, int index,
+			int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params = convertToParams(tids,"gtypeId in");
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(tids));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where ";
+		inSql+=convertToParams(tids, "g.gtypeId in");
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(tids, finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	/**
+	 * 輸入類型 in 產生正確數量的佔位符,如:
+	 * 輸入:brandId in   
+	 * 返回 brandId in(?,?)
+	 * @param list
+	 * @param sql 
+	 * @return 拼好的字符
+	 */
+	private String convertToParams(List<Integer> list,String sql) {
+		sql+="(";
+		for (int i = 0; i < list.size(); i++) {
+			sql+="?,";
+		}
+		sql=sql.substring(0,sql.length()-1);
+		sql+=")";
+		return sql;
+	}
+	
+	/**
+	 * 把list变为一个Object数组
+	 * @param list
+	 * @return
+	 */
+	private Object[] convertListToShu(List<Integer> list)
+	{
+		Integer[] integers=new Integer[list.size()];
+		for (int i=0;i<list.size();i++) {
+			integers[i]=list.get(i);
+		}
+		return integers;
+	}
+
+	
+	
+	@Override
+	public PageBean<Goods> FindGoodsByGcategories(List<Integer> gcaids,
+			int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params = convertToParams(gcaids,"gcategories in");
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(gcaids));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where ";
+		inSql+=convertToParams(gcaids, "g.gcategories in");
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(gcaids, finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	@Override
+	public PageBean<Goods> FindGoodsByBrandId(List<Integer> bids, int index,
+			int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params = convertToParams(bids,"brandId in");
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(bids));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where ";
+		inSql+=convertToParams(bids, "g.brandid in");
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(bids, finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	@Override
+	public PageBean<Goods> FindGoodsByBrandIdAndGcategories(List<Integer> bids,
+			List<Integer> gcaids, int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params1 = convertToParams(bids,"brandId in");
+		String params2 = convertToParams(gcaids,"gcategories in");
+		String params=params1+" and "+params2;
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(convertListAList(bids, gcaids)));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where "+params;
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(bids,gcaids ,finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	/**
+	 * 把两个list变为一个Object数组
+	 * @param list
+	 * @return
+	 */
+	private List<Integer> convertListAList(List<Integer> list1,List<Integer> list2)
+	{
+		List<Integer> list=new ArrayList<Integer>();
+		for (Integer integer : list1) {
+			list.add(integer);
+		}
+		for (Integer integer : list2) {
+			list.add(integer);
+		}
+		return list;
+	}
+	
+	/**
+	 * 把三个list变为一个list
+	 * @param list
+	 * @return
+	 */
+	private List<Integer> convertListAList(List<Integer> list1,List<Integer> list2,List<Integer> list3)
+	{
+		List<Integer> list=convertListAList(list1, list2);
+		for (Integer integer : list3) {
+			list.add(integer);
+		}
+		return list;
+	}
+	
+	private List<Integer> convertListAList(List<Integer> list1,List<Integer> list2,List<Integer> list3,List<Integer> list4)
+	{
+		List<Integer> list=convertListAList(list1, list2,list3);
+		for (Integer integer : list4) {
+			list.add(integer);
+		}
+		return list;
+	}
+	
+	@Override
+	public PageBean<Goods> FindGoodsByTypeIdAndGca(List<Integer> tids,
+			List<Integer> gcaids, int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params1 = convertToParams(tids,"gtypeId in");
+		String params2 = convertToParams(gcaids,"Gcategories in");
+		String params=params1+" and "+params2;
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(convertListAList(tids, gcaids)));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where "+params;
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(tids,gcaids,finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	@Override
+	public PageBean<Goods> FindGoodsByTypeIdAndBrabd(List<Integer> tids,
+			List<Integer> bids, int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params1 = convertToParams(tids,"gtypeId in");
+		String params2 = convertToParams(bids,"brandId in");
+		String params=params1+" and "+params2;
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(convertListAList(tids, bids)));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where "+params;
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(tids,bids,finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	@Override
+	public PageBean<Goods> FindGoodsByTypeIdAndBrabdAndGca(List<Integer> tids,
+		List<Integer> bids, List<Integer> gcaids, int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods where ";
+		String params1 = convertToParams(tids,"gtypeId in");
+		String params2 = convertToParams(bids,"brandId in");
+		String params3 = convertToParams(gcaids,"Gcategories in");
+		String params=params1+" and "+params2+" and "+params3;
+		sql+=params;
+		int rowCount = getCount(sql, convertListToShu(convertListAList(tids, bids, gcaids)));
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g where "+params;
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Integer> finalList=new ArrayList<Integer>();
+		finalList.add((index - 1) * pageSize);
+		finalList.add(index * pageSize);
+		List<Goods> list = executQuery(sql, convertListToShu(convertListAList(tids,bids,gcaids,finalList)));
+		pb.setList(list);
+		return pb;
+	}
+
+	
+
+	@Override
+	public PageBean<Goods> FindAllGoods(int index, int pageSize) {
+		PageBean<Goods> pb = new PageBean<Goods>();
+		String sql = "select * from goods ";
+		int rowCount = getCount(sql);
+		pb.setTotalCount(rowCount);
+		pb.setPageIndex(index);
+		pb.setPageSize(pageSize);
+		String inSql="select g.*,rownum rn from goods g";
+		sql="select * from ("+inSql+") where rn>? and rn<=?";
+		List<Goods> list = executQuery(sql,(index-1)*pageSize,index*pageSize);
+		pb.setList(list);
+		return pb;
+	}
+	@Override
+	public Goods getEntity(ResultSet rs) {
+		// TODO Auto-generated method stub
+		GtypeDao gDao = new GtypeDaoImpl();
+		BrandDao bDao = new BrandDaoImpl();
+		try {
+				Goods goods = new Goods();
+				goods.setGid(rs.getInt("gid"));
+				goods.setGname(rs.getString("gname"));
+				goods.setNew_price(rs.getDouble("new_price"));
+				goods.setOld_price(rs.getDouble("old_price"));
+				goods.setDescription(rs.getString("description"));
+				goods.setImgUrl(rs.getString("imgUrl"));
+				goods.setType(gDao.FindGtypeByGid(rs.getInt("gtypeId")));
+				goods.setGcategories(rs.getInt("gcategories"));
+				goods.setBrand(bDao.FindBrandByBid(rs.getInt("brandId")));
+				return goods;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+}

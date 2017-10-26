@@ -1,0 +1,43 @@
+package cn.bug.dao;
+
+import java.util.List;
+
+import cn.bug.bean.Command;
+/**
+ * 
+
+ * @ClassName:     CommandDao.java
+
+ * @Description:   TODO
+
+ * 
+
+ * @author          vincent
+
+ * @version         V1.0  
+
+ * @Date           2016-7-25 上午10:01:21
+ */
+public interface CommandDao {
+	
+	/**
+	 * 添加评论
+	 * @param comm
+	 * @return
+	 */
+	public boolean AddCommand(Command comm);
+	/**
+	 * 根据商品编号连表查询
+	 * @param gid
+	 * @return 该商品所有订单的评论集合
+	 */
+	public List<Command> FindCommamdByGid(int gid);
+	/**
+	 * 根据订单编号查询评论
+	 * @param oid
+	 * @return 该订单评论
+	 */
+	public Command FindCommandByOid(int oid);
+	
+	
+}
