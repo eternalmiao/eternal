@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+	"http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<constant name="struts.devMode" value="true"></constant>
+	<constant name="struts.i18n.encoding" value="true"></constant>
+	<package name="default" namespace="/" extends="struts-default">
+		<action name="login" class="loginAction">
+				<result name="success">index.jsp</result>
+				<result name="error">login.jsp</result>
+		</action>
+		
+		<action name="left" class="leftAction">
+			<result name="success">left.jsp</result>
+		</action>
+
+		<action name="search" class="searchAction">
+			<result name="success">main.jsp</result>
+		</action>
+		
+		<action name="spam" class="searchAction" method ="spam">
+			<result name="success">main.jsp</result>
+		</action>
+		
+		<action name="send" class="sendAction">
+			<result name="success">index.jsp</result>
+			<result name="success">write.jsp</result>
+		</action>
+		
+		<action name="read" class="readAction">
+			<result name="success">read.jsp</result>
+		</action>
+		
+		<action name="filter" class="filterAction">
+			<result name="success">filter.jsp</result>
+		</action>
+		
+		<action name="white" class="manageAction" method="white">
+			<result name="success">manage.jsp</result>
+		</action>
+		
+		<action name="black" class="manageAction" method="black">
+			<result name="success">manage.jsp</result>
+		</action>
+		
+		<action name="keyword" class="manageAction" method="keyword">
+			<result name="success">manage.jsp</result>
+		</action>
+		
+		<action name="title" class="addAction" method="title">
+			<result name="success">add.jsp</result>
+		</action>
+		
+		<action name="add" class="addAction">
+			<result name="success">manage.jsp</result>
+		</action>
+		
+		<action name="function" class="functionAction">
+			<result name="success">function.jsp</result>
+		</action>
+		
+		<action name="change" class="functionAction" method="change">
+			<result name="success">function.jsp</result>
+		</action>
+	</package>
+</struts>

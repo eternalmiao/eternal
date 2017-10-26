@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.bean.Mail" table="mail" catalog="mymail"> 
+		<id name="id" type="integer">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+        <property name="item" type="string">
+			<column name="item" length="100"/>
+		</property>
+		<property name="sender" type="string">
+			<column name="sender" length="100"/>
+		</property>
+		<property name="recipient" type="string">
+			<column name="recipient" length="100"/>
+		</property>
+		<property name="date" type="string">
+			<column name="date" length="100"/>
+		</property>
+		<property name="subject" type="string">
+			<column name="subject" length="100"/>
+		</property>
+		<property name="content" type="string">
+			<column name="content" length="1024"/>
+		</property>
+	</class>
+</hibernate-mapping>

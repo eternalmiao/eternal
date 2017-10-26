@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/context
+	                    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	                    http://www.springframework.org/schema/aop
+	                    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	                    http://www.springframework.org/schema/tx
+	                    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+	</bean>
+	
+	<bean id="mailDao" class="cn.dao.impl.MailDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="blacklistDao" class="cn.dao.impl.BlacklistDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="whitelistDao" class="cn.dao.impl.WhitelistDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="keywordDao" class="cn.dao.impl.KeywordDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="tokenCountDao" class="cn.dao.impl.TokenCountDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="assortmentDao" class="cn.dao.impl.AssortmentDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="functionDao" class="cn.dao.impl.FunctionDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="userDao" class="cn.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="blackFilter" class="cn.util.BlackFilter">
+		<property name="ud" ref="userDao"></property>
+		<property name="bd" ref="blacklistDao"></property>
+	</bean>
+	
+	<bean id="whiteFilter" class="cn.util.WhiteFilter">
+		<property name="ud" ref="userDao"></property>
+		<property name="wd" ref="whitelistDao"></property>
+	</bean>
+	
+	<bean id="keywordFilter" class="cn.util.KeywordFilter">
+		<property name="ud" ref="userDao"></property>
+		<property name="kd" ref="keywordDao"></property>
+	</bean>
+	
+	<bean id="bayesFilter" class="cn.util.BayesFilter">
+		<property name="td" ref="tokenCountDao"></property>
+	</bean>
+	
+	<bean id="loginAction" class="cn.action.LoginAction">
+		<property name="mailDao" ref="mailDao"></property>
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	
+	<bean id="searchAction" class="cn.action.SearchAction">
+		<property name="mailDao" ref="mailDao"></property>
+		<property name="assortmentDao" ref="assortmentDao"></property>
+	</bean>
+	
+	<bean id="leftAction" class="cn.action.LeftAction">
+		<property name="assortmentDao" ref="assortmentDao"></property>
+	</bean>
+	
+	<bean id="sendAction" class="cn.action.SendAction">
+	</bean>
+	
+	<bean id="readAction" class="cn.action.ReadAction">
+		<property name="mailDao" ref="mailDao"></property>
+	</bean>
+	
+	<bean id="filterAction" class="cn.action.FilterAction">
+		<property name="assortmentDao" ref="assortmentDao"></property>
+		<property name="functionDao" ref="functionDao"></property>
+		<property name="whiteFilter" ref="whiteFilter"></property>
+		<property name="blackFilter" ref="blackFilter"></property>
+		<property name="keywordFilter" ref="keywordFilter"></property>
+		<property name="bayesFilter" ref="bayesFilter"></property>
+	</bean>
+	
+	<bean id="functionAction" class="cn.action.FunctionAction">
+		<property name="functionDao" ref="functionDao"></property>
+	</bean>
+	
+	<bean id="addAction" class="cn.action.AddAction">
+		<property name="whitelistDao" ref="whitelistDao"></property>
+		<property name="blacklistDao" ref="blacklistDao"></property>
+		<property name="keywordDao" ref="keywordDao"></property>
+	</bean>
+	
+	<bean id="manageAction" class="cn.action.ManageAction">
+		<property name="whitelistDao" ref="whitelistDao"></property>
+		<property name="blacklistDao" ref="blacklistDao"></property>
+		<property name="keywordDao" ref="keywordDao"></property>
+	</bean>
+	
+	
+     <bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+     </bean>
+
+     <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+          <tx:method name="insert*"></tx:method>
+          <tx:method name="delete*"></tx:method>
+          <tx:method name="update*"></tx:method>
+        </tx:attributes>
+     </tx:advice>
+	     
+     <aop:config>
+        <aop:pointcut expression="execution(public * cn.dao..*.*(..))" id="bs"/>
+	    <aop:advisor advice-ref="txAdvice" pointcut-ref="bs"/>
+     </aop:config>
+</beans>

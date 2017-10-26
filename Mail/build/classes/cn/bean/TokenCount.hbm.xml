@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.bean.TokenCount" table="tokencount" catalog="mymail"> 
+		<id name="id" type="integer">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+        <property name="token" type="string">
+			<column name="token" length="20"/>
+		</property>
+        <property name="spam" type="integer">
+			<column name="spam" length="10"/>
+		</property>
+        <property name="spamAll" type="integer">
+			<column name="spamAll" length="10"/>
+		</property>
+        <property name="normal" type="integer">
+			<column name="normal" length="10"/>
+		</property>
+        <property name="normalAll" type="integer">
+			<column name="normalAll" length="10"/>
+		</property>
+		<property name="probability" type="double">
+			<column name="probability" length="10"/>
+		</property>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.bean.Function" table="function" catalog="mymail"> 
+		<id name="id" type="integer">
+			<column name="id" />
+			<generator class="identity" />
+		</id>
+		<many-to-one name="user" class="cn.bean.User">
+			<column name="uid" not-null="true" />
+		</many-to-one>
+		<property name="white" type="integer">
+			<column name="white" length="2" not-null="true"/>
+		</property>
+		<property name="black" type="integer">
+			<column name="black" length="2" not-null="true"/>
+		</property>
+		<property name="keyword" type="integer">
+			<column name="keyword" length="2" not-null="true"/>
+		</property>
+		<property name="bayes" type="integer">
+			<column name="bayes" length="2" not-null="true"/>
+		</property>
+	</class>
+</hibernate-mapping>
